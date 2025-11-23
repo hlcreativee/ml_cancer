@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Prediksi Kanker Payudara</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        /* ----------------------------- */
+        /* BACKGROUND GRADIENT PREMIUM   */
+        /* ----------------------------- */
+        body {
+            background: linear-gradient(135deg, #7b4397, #dc2430);
+            min-height: 100vh;
+            padding-top: 40px;
+            color: #333;
+        }
+
+        body.dark-mode {
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            color: white;
+        }
+
+        /* ----------------------------- */
+        /* GLASS CARD (GLASSMORPHISM)    */
+        /* ----------------------------- */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+            color: white;
+        }
+
+        .glass-card.dark-mode {
+            background: rgba(0, 0, 0, 0.25);
+            color: white;
+        }
+
+        /* ----------------------------- */
+        /* INPUT MODERN & GLOW           */
+        /* ----------------------------- */
+        .form-control {
+            border-radius: 12px;
+            padding: 10px 12px;
+            border: 2px solid transparent;
+        }
+
+        .form-control:focus {
+            border-color: #ff89c0;
+            box-shadow: 0 0 10px rgba(255, 137, 192, 0.8);
+        }
+
+        .form-control.dark-mode {
+            background-color: rgba(255,255,255,0.1);
+            color: white;
+            border-color: rgba(255,255,255,0.3);
+        }
+
+        .form-control.dark-mode::placeholder {
+            color: #ddd;
+        }
+
+        /* TITLE STYLE */
+        .title {
+            font-size: 42px;
+            font-weight: 800;
+            text-align: center;
+            color: white;
+            margin-bottom: 25px;
+            text-shadow: 0 4px 20px rgba(0,0,0,0.4);
+        }
+
+        /* BUTTONS */
+        .btn-custom {
+            font-size: 18px;
+            padding: 12px;
+            border-radius: 12px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+    <h2 class="title">🎗️ Prediksi Kanker Payudara</h2>
+
+    <div class="glass-card" id="mainCard">
+        
+        <div class="d-flex justify-content-end mb-3">
+            <button id="toggleMode" class="btn btn-light">Dark Mode</button>
+        </div>
+
+        <form method="POST">
+            <div class="row g-3">
+                {% for f in fields %}
+                <div class="col-md-6">
+                    <input type="number" step="any" name="{{ f }}" 
+                        class="form-control"
+                        placeholder="{{ f.replace('_',' ').upper() }}" required>
+                </div>
+                {% endfor %}
+            </div>
+
+            <button type="submit" class="btn btn-outline-light w-100 mt-4 btn-custom" formaction="/predict_id3">
+                Prediksi dengan ID3
+            </button>
+
+            <button type="submit" class="btn btn-outline-warning w-100 mt-2 btn-custom" formaction="/predict_nb">
+                Prediksi dengan Naive Bayes
+            </button>
+        </form>
+
+        {% if hasil_id3 %}
+            <div class="alert alert-info mt-4 text-center fw-bold">{{ hasil_id3 }}</div>
+        {% endif %}
+
+        {% if hasil_nb %}
+            <div class="alert alert-success mt-4 text-center fw-bold">{{ hasil_nb }}</div>
+        {% endif %}
+
+        <a href="/tree" class="btn btn-outline-light w-100 mt-3 btn-custom" target="_blank">
+            🌳 Lihat Pohon Keputusan ID3 & 📜 Lihat Aturan Pohon Keputusan ID3
+        </a>
+
+
+    </div>
+</div>
+
+<script>
+    const toggleBtn = document.getElementById("toggleMode");
+    const body = document.body;
+    const card = document.getElementById("mainCard");
+
+    toggleBtn.addEventListener("click", () => {
+        body.classList.toggle("dark-mode");
+        card.classList.toggle("dark-mode");
+
+        document.querySelectorAll(".form-control").forEach(el =>
+            el.classList.toggle("dark-mode")
+        );
+
+        toggleBtn.textContent = body.classList.contains("dark-mode")
+            ? "Light Mode"
+            : "Dark Mode";
+    });
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>
