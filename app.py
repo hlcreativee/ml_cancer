@@ -3,6 +3,10 @@ import numpy as np
 import pickle
 import subprocess
 from sklearn.tree import export_graphviz, _tree
+import matplotlib
+
+# FIX Railway: non-GUI backend
+matplotlib.use("Agg")
 
 app = Flask(__name__)
 
@@ -17,14 +21,14 @@ model_nb = pickle.load(open("cancer_nb.pkl", "rb"))
 # =============================
 FEATURES_CANCER = [
     "radius_mean", "texture_mean", "perimeter_mean", "area_mean", "smoothness_mean",
-    "compactness_mean", "concavity_mean", "concave points_mean", "symmetry_mean",
+    "compactness_mean", "concavity_mean", "concave_points_mean", "symmetry_mean",
     "fractal_dimension_mean",
     "radius_se", "texture_se", "perimeter_se", "area_se", "smoothness_se",
-    "compactness_se", "concavity_se", "concave points_se", "symmetry_se",
+    "compactness_se", "concavity_se", "concave_points_se", "symmetry_se",
     "fractal_dimension_se",
     "radius_worst", "texture_worst", "perimeter_worst", "area_worst",
     "smoothness_worst", "compactness_worst", "concavity_worst",
-    "concave points_worst", "symmetry_worst", "fractal_dimension_worst"
+    "concave_points_worst", "symmetry_worst", "fractal_dimension_worst"
 ]
 
 # =============================
@@ -64,11 +68,9 @@ def extract_rules(model, feature_names):
             name = feature_names[tree.feature[node]]
             threshold = tree.threshold[node]
 
-            # kiri: <=
             left_rule = rule_text + [f"{name} <= {threshold:.3f}"]
             traverse(tree.children_left[node], left_rule)
 
-            # kanan: >
             right_rule = rule_text + [f"{name} > {threshold:.3f}"]
             traverse(tree.children_right[node], right_rule)
         else:
@@ -89,7 +91,7 @@ def tree():
     import io
     import base64
 
-    fig, ax = plt.subplots(figsize=(20, 12))  # ukuran gambar
+    fig, ax = plt.subplots(figsize=(20, 12))
     plot_tree(
         model_id3,
         feature_names=FEATURES_CANCER,
@@ -99,22 +101,19 @@ def tree():
         ax=ax
     )
 
-    # simpan ke buffer
     buf = io.BytesIO()
     plt.savefig(buf, format="png", bbox_inches="tight")
     buf.seek(0)
 
-    # convert ke base64
     img_base64 = base64.b64encode(buf.getvalue()).decode("utf-8")
     plt.close(fig)
 
-    # ambil rules
     rules_list = extract_rules(model_id3, FEATURES_CANCER)
 
     return render_template("tree.html", tree_image=img_base64, rules=rules_list)
-    
+
 # =============================
 # MAIN
 # =============================
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port=5000)
