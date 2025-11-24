@@ -84,29 +84,35 @@ def extract_rules(model, feature_names):
 # =============================
 @app.route("/tree")
 def tree():
-    # Export pohon ke .dot
-    dot_file = "tree_temp.dot"
-    export_graphviz(
+    import matplotlib.pyplot as plt
+    from sklearn.tree import plot_tree
+    import io
+    import base64
+
+    fig, ax = plt.subplots(figsize=(20, 12))  # ukuran gambar
+    plot_tree(
         model_id3,
-        out_file=dot_file,
         feature_names=FEATURES_CANCER,
         class_names=["B", "M"],
         filled=True,
         rounded=True,
-        special_characters=True,
-        proportion=True
+        ax=ax
     )
 
-    # Convert .dot ke SVG
-    svg_bytes = subprocess.check_output(["dot", "-Tsvg", dot_file])
-    svg_text = svg_bytes.decode("utf-8")
+    # simpan ke buffer
+    buf = io.BytesIO()
+    plt.savefig(buf, format="png", bbox_inches="tight")
+    buf.seek(0)
 
-    # Extract rules
+    # convert ke base64
+    img_base64 = base64.b64encode(buf.getvalue()).decode("utf-8")
+    plt.close(fig)
+
+    # ambil rules
     rules_list = extract_rules(model_id3, FEATURES_CANCER)
 
-    # Render halaman tree + rules
-    return render_template("tree.html", tree_image=svg_text, rules=rules_list)
-
+    return render_template("tree.html", tree_image=img_base64, rules=rules_list)
+    
 # =============================
 # MAIN
 # =============================
